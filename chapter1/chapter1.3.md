@@ -189,6 +189,7 @@ select value from v$parameter where name = 'db_block_size';
 	- ROWID가 있다면, 목표 블록으로 즉시 이동 가능하기 때문에 필요한 블록 딱 하나만 읽어도 된다.
 
 #### ROWID란?
+
 | 구성 요소 | 길이 (Base64) | 설명 |
 |---|---|---|
 | Data Object Number | 6자리 | 어떤 테이블(객체)인가? |
@@ -199,10 +200,10 @@ select value from v$parameter where name = 'db_block_size';
 - 데이터베이스에서 ROWID는 데이터베이스 내의 특정 행(Row)이 저장된 물리적인 위치를 가리키는 고유한 식별자이다. 
 - 현재 오라클에서 표준으로 사용하는 **확장 ROWID(Extended ROWID)** 는 총 18자리(Base64 인코딩)로 구성된다.
 
-- ROWID = [Object ID] + [DBA (File # + Block #)] + [Row Number]
-	- Object ID : 어느 테이블인지 식별 (6자리)
-	• DBA 영역: [Relative File Number : 파일 위치 (3자리)] + [Block Number : 블록 위치 (6자리)]
-	• Row Number : 블록 내 행 번호 (3자리)
+- `ROWID` = [Object ID] + [DBA (File # + Block #)] + [Row Number]
+	- `Object ID` : 어느 테이블인지 식별 (6자리)
+	- DBA 영역: [`Relative File Number` : 파일 위치 (3자리)] + [`Block Number` : 블록 위치 (6자리)]
+	- `Row Number` : 블록 내 행 번호 (3자리)
 
 > 참고: ROWID는 데이터의 "물리적 주소"이기 때문에, 테이블 내에서 데이터를 찾는 가장 빠른 방법입니다.
 
