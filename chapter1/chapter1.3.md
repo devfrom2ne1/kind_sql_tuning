@@ -16,6 +16,8 @@
 
 2. 디스크 I/O가 느린 이유
 
+![image](https://github.com/user-attachments/assets/539ffb5a-1707-4471-9e01-981d4c4ff000)
+
 | 구분 | 메모리 (RAM) | 디스크 (HDD/SSD) |
 |---|---|---|
 | 속도 | 매우 빠름 (전기적 신호) | 상대적으로 매우 느림 (물리적 작동 수반) |
