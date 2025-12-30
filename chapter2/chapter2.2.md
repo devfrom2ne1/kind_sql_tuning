@@ -153,9 +153,7 @@ SELECT * FROM 사원 WHERE 사원번호 = 30
 ```
 
 - 아니면 자동으로 SQL 옵티마이저가 IN-List Iterator 방식을 사용해서 List 갯수만큼 Index Range Scan을 반복한다. 
-
-				> "IN-List Iterator는 쿼리를 지저분하게 UNION ALL로 직접 쓰지 않아도, 똑같은 성능 효과(인덱스 시작점 개별 탐색)를 내게 해주는 오라클의 자동 반복 기능이다."
-
+> "IN-List Iterator는 쿼리를 지저분하게 UNION ALL로 직접 쓰지 않아도, 똑같은 성능 효과(인덱스 시작점 개별 탐색)를 내게 해주는 오라클의 자동 반복 기능이다."
     1. 쿼리 변환(`UNION ALL`) vs 실행 방식(`Iterator`)
         - 진짜 UNION ALL로 바뀌는 경우 (OR Expansion)
             - 오라클 옵티마이저가 쿼리를 분석하다가 IN이나 OR를 만나면? 
