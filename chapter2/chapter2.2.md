@@ -195,13 +195,32 @@ SELECT * FROM 사원 WHERE 사원번호 = 30
 ### 2.2.5 ORDER BY 절에서 컬럼 가공
 
 - ORDER BY에 쓰인 컬럼명은 테이블 컬럼명이 아닌 SELECT-LIST에 적힌 컬럼명이다. 
-- 그래서 SELECT-LIST에서 가공된 컬럼명이 Alias로 적혀 있으면, 해당 가공된 컬럼을 기준으로 SORT ORDER BY 연산이 실행계획에 나타난다. 
+- 그래서 SELECT-LIST에서 가공된 컬럼명이 Alias로 적혀 있으면?
+	- 해당 가공된 컬럼을 기준으로 `SORT ORDER BY` 연산이 실행계획에 나타난다. 
 
-* 친절한 SQL튜닝 98~99페이지 참고하기
+- `주문_PK 인덱스` : [주문일자 + 주문번호] 인 경우를 생각해보자
+
+```sql
+SELECT *
+FROM (
+	SELECT TO_CHAR(A.주문번호, 'FM000000') AS 주문번호, A.업체번호, A.주문금액
+		FROM 주문 A
+	WHERE A.주문일자 = :dt
+		AND A.주문번호 > NVL(:next_ord_no, 0)
+	ORDER BY 주문번호
+)
+WHERE ROWNUM <= 30
+```
+
+- `SORT ORDER BY` 연산이 생략되지 못하는 이유는?
+	- 여기선 `ORDER BY` 절 뒤에 원래 컬럼이 아닌 TO_CHAR 가공한 '주문번호'가 쓰여 있기 때문이다. 
+
+- 정렬을 생략하려면?
+	- `ORDER BY 주문번호`를 `ORDER BY A.주문번호`로 변경해야 한다. 
 
 ### 2.2.6 SELECT-LIST에서 컬럼 가공
 
-- 인덱스를 이용해 최댓값 또는 최소값을 구할때는, 인덱스 리프 블록의 왼쪽(MIN) 또는 오른쪽(MAX)에서 레코드 하나(FIRST ROW)만 읽고 멈춘다. 
+- 인덱스를 이용해 최댓값 또는 최소값을 구할때는, 인덱스 리프 블록의 왼쪽(MIN) 또는 오른쪽(MAX)에서 레코드 하나(FIRST ROW)만 읽고 멈춘다.
 
 ### 2.2.7 자동 형변환
 
