@@ -133,9 +133,42 @@ and (고객명 <> :cust_nm or 고객명 is null)
 
 #### IN 조건절
 
+
+```sql
+/* 사원번호 10, 20, 30번을 찾는 IN-List 쿼리*/
+SELECT * FROM 사원 
+WHERE 사원번호 IN (10, 20, 30);
+```
+
 - IN은 OR나 같다. 
 - 그래서 `UNION ALL` 방식으로 작성하면 브랜치 별로 인덱스 스캔 시작점을 알 수 있어 Range Scan이 가능하다.
+
+```sql
+/* 오라클이 내부적으로 처리하는 논리적 구조 */
+SELECT * FROM 사원 WHERE 사원번호 = 10
+UNION ALL
+SELECT * FROM 사원 WHERE 사원번호 = 20
+UNION ALL
+SELECT * FROM 사원 WHERE 사원번호 = 30
+```
+
 - 아니면 자동으로 SQL 옵티마이저가 IN-List Iterator 방식을 사용해서 List 갯수만큼 Index Range Scan을 반복한다. 
+				> "IN-List Iterator는 쿼리를 지저분하게 UNION ALL로 직접 쓰지 않아도, 똑같은 성능 효과(인덱스 시작점 개별 탐색)를 내게 해주는 오라클의 자동 반복 기능이다."
+
+    1. 쿼리 변환(`UNION ALL`) vs 실행 방식(`Iterator`)
+        - 진짜 UNION ALL로 바뀌는 경우 (OR Expansion)
+            - 오라클 옵티마이저가 쿼리를 분석하다가 IN이나 OR를 만나면? 
+												- 아예 쿼리 구조 자체를 `SELECT ... UNION ALL SELECT ...` 형태로 물리적으로 쪼개버립니다. 
+												- 이를 OR Expansion이라고 부릅니다.
+        - IN-List Iterator로 작동하는 경우
+												- 쿼리 구조는 그대로 둡니다.
+												- 다만, **실행 엔진(Execution Engine)** 이 IN 안에 들어있는 값의 개수만큼 인덱스 탐색을 루프(Loop) 돌리는 방식입니다.
+				2. 왜 `UNION ALL`로 안 바꾸고 `Iterator`를 쓸까?
+								- 만약 IN (1, 2, 3, ..., 100)처럼 값이 100개라면, 
+								- 이걸 진짜 UNION ALL 100개로 바꾸면 SQL 문장이 너무 길어지고 메모리(Shared Pool)도 많이 잡아먹게 됩니다.
+								- 그래서 오라클은 쿼리 모양은 유지하고, 대신 실행할 때만 **INLIST ITERATOR** 라는 반복 기계를 꺼내는 것입니다.
+												- 이 기계에 (1, 2, 3...100)이라는 명단을 넣어주고, 
+												- **"명단에 있는 값마다 인덱스 시작점을 찾아서(Range Scan) 결과를 가져와!"** 라고 명령하는 것입니다.
 
 ### 2.2.3 더 중요한 인덱스 사용 조건
 
