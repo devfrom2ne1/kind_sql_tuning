@@ -266,6 +266,10 @@ WHERE 장비번호 = :B1 AND 변경일자 = :B2;
 
 ### 2.2.7 자동 형변환
 
+> 형변환 함수를 생략한다고 해서 연산 횟수가 줄어 성능이 좋아지지 않는다. 옵티마이저가 자동으로 형변환하기 때문이다.
+
+#### (예시) 문자열 컬럼을 숫자로 비교한 경우
+
 ```sql
 select * from cust_base
 where 생년월일 = 19881225
@@ -297,6 +301,8 @@ AND 거래일자 between :trd_dt1 and :trd_dt2
 
 #### `decode` 형변환 주의
 - `decode(a, b, c, d)` 에서 c의 데이터타입을 기준으로 반환값의 데이터 타입이 결정된다.
-- 세 번째 인자가 `null` 이라면 `varchar2` 로 취급된다. 
-- `decode(job, 'PRESIDENT', to_number(NULL), sal)` 로 `NULL`의 데이터타입을 명시해줘야 한다. 
+- 세 번째 인자가 `null` 이라면 `varchar2` 로 취급된다. 		
+- 만약, 문자열이 아닌 상태로 정렬하고 싶다면, null의 데이터 타입을 명시해줘야 한다.
+- `decode(job, 'PRESIDENT', to_number(NULL), sal)`
 	- job이 'PRESIDENT'면, to_number(NULL)을 반환하고, 아니면 sal을 반환한다.
+	- 아니면 to_number(NULL) 대신 숫자 `0`을 써도 된다.
