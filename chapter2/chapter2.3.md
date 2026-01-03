@@ -54,8 +54,8 @@
 
 #### Index Unique Scan이 아닌 Index Range Scan으로 검색되는 경우
 1. Unique인덱스를 범위검색 조건(between, LIKE, >=...) 으로 검색한다면?
-	- Index Range Scan으로 처리된다.
-	- 수직적 탐색만으로는 조건에 해당하는 레코드를 전부 찾을 수 없기 때문이다.
+- Index Range Scan으로 처리된다.
+- 수직적 탐색만으로는 조건에 해당하는 레코드를 전부 찾을 수 없기 때문이다.
 
 2. Unique 결합 인덱스의 일부 컬럼만 가지고 검색한다면?
 	- 이때도 Index Range Scan으로 처리된다.
