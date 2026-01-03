@@ -296,6 +296,7 @@ AND 거래일자 between :trd_dt1 and :trd_dt2
 - LIKE 조건으로 검색하면서 자동 형변환이 발생해 계좌번호가 아예 인덱스 액세스 조건으로 사용되지 못하기 때문이다.
 
 #### `decode` 형변환 주의
-- `decode(a, b, c, d)` 에서 c의 데이터타입을 기준으로 반환값의 데이터 타입이 결정된다. 
+- `decode(a, b, c, d)` 에서 c의 데이터타입을 기준으로 반환값의 데이터 타입이 결정된다.
 - 세 번째 인자가 `null` 이라면 `varchar2` 로 취급된다. 
 - `decode(job, 'PRESIDENT', to_number(NULL), sal)` 로 `NULL`의 데이터타입을 명시해줘야 한다. 
+	- job이 'PRESIDENT'면, to_number(NULL)을 반환하고, 아니면 sal을 반환한다.
