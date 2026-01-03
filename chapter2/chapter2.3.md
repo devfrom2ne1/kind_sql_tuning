@@ -73,6 +73,7 @@
 		- Distinct Value는 중복값을 의미하는 것이 아님!
 
 - 실행계획 : `INDEX(SKIP SCAN)`
+
 - 힌트 
 	1. 인덱스 스킵 스캔 방식을 유도할 때는?
 		- `index_ss` 힌트를 사용한다.
@@ -146,6 +147,8 @@ WHERE 기준일자 BETWEEN '20080501' AND '20080531'
 
 
 ### 2.3.5 Index Fast Full Scan
+
+- 힌트 : `index_ffs` / `no_index_ffs`
 
 - Index Full Scan보다 빠른 이유는?
 	- 논리적 인덱스 트리 구조를 무시하고, Multiblock I/O 방식으로 세그먼트 전체를 스캔하기 때문이다.
