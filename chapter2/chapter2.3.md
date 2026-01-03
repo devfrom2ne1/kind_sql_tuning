@@ -53,11 +53,11 @@
 
 
 #### Index Unique Scan이 아닌 Index Range Scan으로 검색되는 경우
-- Unique인덱스를 범위검색 조건(between, LIKE, >=...) 으로 검색한다면?
+1. Unique인덱스를 범위검색 조건(between, LIKE, >=...) 으로 검색한다면?
 	- Index Range Scan으로 처리된다.
 	- 수직적 탐색만으로는 조건에 해당하는 레코드를 전부 찾을 수 없기 때문이다.
 
-- Unique 결합 인덱스의 일부 컬럼만 가지고 검색한다면?
+2. Unique 결합 인덱스의 일부 컬럼만 가지고 검색한다면?
 	- 이때도 Index Range Scan으로 처리된다.
 	-	Unique 인덱스라 하더라도, 결합인덱스에 쓰인 컬럼이 모두 조합되었을 때만 중복되지 않는 Unique한 값이 되는 것이다.
 	- 따라서 일부 컬럼만 쓰면 중복된 값이 나올 가능성이 생기기 때문에, 오라클은 안전하게 '범위를 훑는(Range Scan)' 방식을 택한다.
