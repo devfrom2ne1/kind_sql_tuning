@@ -78,9 +78,9 @@
 
 
 ### 3.1.3 인덱스 손익분기점
-- Index Range Scan에 의한 테이블 액세스가 Table Full Scan보다 느려지는 지점을 '인덱스 손익분기점'이라고 한다.
-	- Table Full Scan은 성능이 일정하다.
-	- Index Range Scan은 전체 중 몇 건을 추출하느냐에 따라 성능이 달라진다.(많을수록 느려짐)
+Index Range Scan에 의한 테이블 액세스가 Table Full Scan보다 느려지는 지점을 '인덱스 손익분기점'이라고 한다.
+- Table Full Scan은 성능이 일정하다.
+- Index Range Scan은 전체 중 몇 건을 추출하느냐에 따라 성능이 달라진다.(많을수록 느려짐)
 
 #### '인덱스 테이블 액세스'가 '테이블 풀 스캔' 보다 느린 핵심 요인은?
 
