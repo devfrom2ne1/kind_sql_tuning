@@ -257,7 +257,6 @@ Rows     Row Source Operation
 
 3. 튜닝 방안 
 
-```
 | Call | Count | CPU Time | Elapsed Time | Disk | Query | Current | Rows |
 |---|---|---|---|---|---|---|---|
 | Parse | 1 | 0.000 | 0.001 | 0 | 0 | 0 | 0 |
@@ -265,6 +264,7 @@ Rows     Row Source Operation
 | Fetch | 78 | 0.140 | 0.154 | 0 | 2902 | 0 | 1909 |
 | Total | 80 | 0.140 | 0.156 | 0 | 2902 | 0 | 1909 |
 
+```
 Rows     Row Source Operation
 -------  -----------------------------------------------------------------------
    1909  TABLE ACCESS BY INDEX ROWID 로밍렌탈 (cr=2902 pr=0 pw=0 time=... )
