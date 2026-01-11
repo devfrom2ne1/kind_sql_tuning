@@ -136,8 +136,8 @@ Rows	Row Source Operation
 <조건절 1>
 where C1 = 1
 and   C2 = 'A'
-and	  C3 = '나'
-and 		C4 = 'a'
+and   C3 = '나'
+and   C4 = 'a'
 ```
 
 
