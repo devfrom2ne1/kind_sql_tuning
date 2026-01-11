@@ -360,7 +360,8 @@ and   상품ID || '' in ('NH00037', 'NH00041', 'NH00050')
 
 ### 3.3.9 BETWEEN과 LIKE 스캔 범위 비교
 
-- LIKE보다 BETWEEN을 사용하는 것이 더 낫다.
+> [!NOTE]
+> LIKE보다 BETWEEN을 사용하는 것이 더 낫다.
 
 ```sql
 <조건절 1>
@@ -371,6 +372,9 @@ and 판매구분 = 'B'
 where 판매월 LIKE '2019%'
 and 판매구분 = 'B'
 ```
+
+![image](https://github.com/user-attachments/assets/9d3f6888-7e53-43e4-b892-1ccb9be084e8)
+
 
 
 ### 3.3.10 범위검색 조건을 남용할 때 생기는 비효율
