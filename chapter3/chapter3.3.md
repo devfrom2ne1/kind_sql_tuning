@@ -4,7 +4,17 @@
 
 ### 3.3.1 인덱스 탐색
 
-💡 책 173~179p : 탐색과정을 이해할 수 있는 그림!
+![image](https://github.com/user-attachments/assets/911af07e-8884-49d4-b338-81ad617fa6f3)
+
+![image](https://github.com/user-attachments/assets/6a8e8590-5d04-45da-ba5e-a7b3823bb444)
+
+![image](https://github.com/user-attachments/assets/d24594f1-8043-42c2-9c78-794d7370392a)
+
+![image](https://github.com/user-attachments/assets/047bba9c-9902-473f-9cf5-17d3a76bc3c1)
+
+![image](https://github.com/user-attachments/assets/5a8d533e-59ba-473b-950e-612cce70e6bf)
+
+![image](https://github.com/user-attachments/assets/ffa2b957-cd15-4733-bb89-3b600c5b68da)
 
 ### 3.3.2 인덱스 스캔 효율성
 
