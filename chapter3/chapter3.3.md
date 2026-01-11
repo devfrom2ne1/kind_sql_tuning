@@ -226,11 +226,19 @@ order by 입력일 desc
 
 ### 3.3.7 Index Skip Scan 활용
 
+> [!NOTE]
+> 선두컬럼이 	BETWEEN이어서 나머지 검색 조건을 만족하는 데이터들이 서로 멀리 떨어져 있을 때, Index Skip Scan의 위력이 나타난다.
+
 ```sql
 create index 월별고객별판매집계_IDX2 on 월별고객별판매집계(판매월, 판매구분);
 ```
 
 ![image](https://github.com/user-attachments/assets/7b294422-28ca-412f-87cf-8752d59e75b4)
+
+| 구분 | between | IN-List | Skip Scan |
+|---|---|---|---|
+| 블록 I/O( = `cr`) | 3,090 | 314 | 300 |
+
 
 ```sql
 <between>
@@ -255,12 +263,6 @@ from 월별고객별판매집계 t
 where 판매구분 = 'A'
 and   판매월 between '201801' and '201812'
 ```
-
-|구분| between | IN-List | Skip Scan|
-|---|---|---|---|
-|블록 I/O(cr)| 3,090 | 314 | 300 |
-
-- 선두컬럼이 	BETWEEN이어서 나머지 검색 조건을 만족하는 데이터들이 서로 멀리 떨어져 있을 때, Index Skip Scan의 위력이 나타난다.
 
 ### 3.3.8 IN 조건은 '='인가
 
