@@ -268,14 +268,18 @@ and   판매월 between '201801' and '201812'
 
 ### 3.3.8 IN 조건은 '='인가
 
+> [!WARNING]
+> 인덱스 스캔을 IN-List Iterator 방식으로 유도하는 것이 무조건 성능향상에 도움이 되는 것은 아니다. 
+
+
+#### 인덱스 선두컬럼이 상품ID인 경우 : [상품ID + 고객번호]
+
 ```sql
 select * 
 from 고객별가입상품
 where 고객번호 = :cust_no
 and   상품ID in ('NH00037', 'NH00041', 'NH00050')
 ```
-
-#### [상품ID + 고객번호]
 
 ![image](https://github.com/user-attachments/assets/d48d9284-e01d-4651-86a7-1a38cd824744)
 
@@ -291,7 +295,15 @@ and   상품ID in ('NH00037', 'NH00041', 'NH00050')
 	- 테이블 전체 or 인덱스 전체 스캔하면서 필터링 해야하므로 비효율적이다.
 
 
-#### [고객번호 + 상품ID]
+#### 인덱스 선두컬럼이 고객번호인 경우 : [고객번호 + 상품ID]
+
+```sql
+select * 
+from 고객별가입상품
+where 고객번호 = :cust_no
+and   상품ID in ('NH00037', 'NH00041', 'NH00050')
+```
+
 ![image](https://github.com/user-attachments/assets/698ff03b-8ecd-4515-b6b1-ffa9a8c1f54d)
 
 1. In-List Iterator 방식으로 푼다면?
