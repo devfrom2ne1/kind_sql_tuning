@@ -320,7 +320,7 @@ and   상품ID in ('NH00037', 'NH00041', 'NH00050')
 #### IN_List를 액세스 조건 또는 필터 조건으로 유인하는 방법
 
 
-1. `NUM_INDEX_KEYS 힌트`
+#### 1. `NUM_INDEX_KEYS` 힌트
 
 ```sql
 select /*+ num_index_keys(a 고객가입별상품_x1 1) */ *
@@ -341,7 +341,7 @@ and   상품ID in ('NH00037', 'NH00041', 'NH00050')
 		- '고객번호'와 '상품ID' 모두 인덱스 액세스 조건으로 사용된다.
 		- 이때는 상품ID가 IN-List Iterator 방식으로 풀린다. 
 
-2. `인덱스 컬럼을 가공`
+#### 2. 인덱스 컬럼을 가공하는 방식
 
 ```sql
 select *
