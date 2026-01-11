@@ -38,7 +38,7 @@ Rows	Row Source Operation
 > "BIG_TABLE_IDX라는 인덱스(찾아보기)에서 조건에 맞는 10개를 먼저 찾은 뒤, 그 10개의 상세 정보를 실제 BIG_TABLE(원본 테이블)에 가서 꺼내왔다."
 
 
-#### 1. 2행 : `INDEX RANGE SCAN BIG_TABLE_IDX`
+#### 1. `INDEX RANGE SCAN BIG_TABLE_IDX` (2열)
 - 인덱스(BIG_TABLE_IDX)의 일정 범위를 훑었다는 뜻입니다.
 - `Rows (10)`
 	- 인덱스에서 조건에 맞는 데이터 10건을 찾아냈습니다.
@@ -46,7 +46,7 @@ Rows	Row Source Operation
 	- 10건을 찾기 위해 7,463번의 블록(데이터 단위) 읽기가 발생했습니다. 
 	- 10건 치고는 꽤 많이 읽은 편입니다.
 
-#### 2. 1행 : `TABLE ACCESS BY INDEX ROWID BIG_TABLE`
+#### 2. `TABLE ACCESS BY INDEX ROWID BIG_TABLE` (1열)
 - 인덱스에서 알아낸 **ROWID(데이터의 물리적 주소)** 를 가지고 실제 테이블에 가서 나머지 컬럼 정보를 가져왔다는 뜻입니다.
 - `Rows (10)`
 	- 최종적으로 10행의 결과가 나왔습니다.
