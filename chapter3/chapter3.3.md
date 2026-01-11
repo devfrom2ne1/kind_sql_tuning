@@ -375,9 +375,17 @@ and 판매구분 = 'B'
 
 ![image](https://github.com/user-attachments/assets/9d3f6888-7e53-43e4-b892-1ccb9be084e8)
 
-
-
 ### 3.3.10 범위검색 조건을 남용할 때 생기는 비효율
+
+```sql
+select *
+from 가입상품
+where 회사코드 = :com
+and 지역코드 like :reg || '%'
+and 상품명 like :prod || '%'
+```
+
+
 
 ### 3.3.11 다양한 옵션 조건 처리 방식의 장단점 비교
 
