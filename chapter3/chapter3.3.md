@@ -27,8 +27,8 @@
 ```
 Rows	Row Source Operation
 ------	-------------------------------------------
-	10	TABLE ACCESS BY INDEX ROWID BIG_TABLE (cr=7471 pr=1466 pw=0 time=22137 us)
-	10		INDEX RANGE SCAN BIG_TABLE_IDX (cr=7463 pr=146 time=22328 us)
+10	TABLE ACCESS BY INDEX ROWID BIG_TABLE (cr=7471 pr=1466 pw=0 time=22137 us)
+10		INDEX RANGE SCAN BIG_TABLE_IDX (cr=7463 pr=146 time=22328 us)
 ```
 
 > "BIG_TABLE_IDX라는 인덱스(찾아보기)에서 조건에 맞는 10개를 먼저 찾은 뒤, 그 10개의 상세 정보를 실제 BIG_TABLE(원본 테이블)에 가서 꺼내왔다."
