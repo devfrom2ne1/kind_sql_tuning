@@ -35,7 +35,7 @@ Rows	Row Source Operation
 
 - SQL 트레이스 읽는 법
 	- 실행 계획은 보통 안쪽(들여쓰기 된 곳)부터 읽습니다.
-	- cr (Consistent Read) : 메모리에서 데이터를 읽은 횟수입니다. (이 숫자가 낮을수록 좋습니다.)
+	- cr (Consistent Read) : 메모리에서 데이터를 읽은 횟수입니다. (낮을수록 Good)
 	- pr (Physical Read) : 메모리에 없어서 **하드디스크(Disk)** 에서 직접 읽어온 횟수입니다. 
 	- time: 총 걸린 시간입니다. 여기서는 약 22ms (0.022초) 정도 소요되었습니다.
 
