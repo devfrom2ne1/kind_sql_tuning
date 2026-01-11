@@ -226,6 +226,18 @@ order by 입력일 desc
 
 ### 3.3.7 Index Skip Scan 활용
 
+```sql
+create index 월별고객별판매집계_IDX2 on 월별고객별판매집계(판매월, 판매구분);
+```
+
+```sql
+select /*+ index(t 월별고객별판매집계_IDX2) */ count(*)
+from 월별고객별판매집계 t
+where 판매구분 = 'A'
+and   판매월 between '201801' and '201802'
+```
+
+
 - Index Skip Scan 힌트 : `/*+ INDEX_SS(t 월별고객별판매집계_IDX2) */`
 - Ex. 2018년 1월 ~ 12월까지의 'A'상품과 'B'상품의 판매데이터
     - 데이터 갯수 : A=10만개, B=110만개
