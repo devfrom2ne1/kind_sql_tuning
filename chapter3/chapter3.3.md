@@ -230,20 +230,37 @@ order by 입력일 desc
 create index 월별고객별판매집계_IDX2 on 월별고객별판매집계(판매월, 판매구분);
 ```
 
+![image](https://github.com/user-attachments/assets/7b294422-28ca-412f-87cf-8752d59e75b4)
+
 ```sql
+<between>
 select /*+ index(t 월별고객별판매집계_IDX2) */ count(*)
 from 월별고객별판매집계 t
 where 판매구분 = 'A'
-and   판매월 between '201801' and '201802'
+and   판매월 between '201801' and '201812'
 ```
 
+```sql
+<IN-List>
+select /*+ index(t 월별고객별판매집계_IDX2) */ count(*)
+from 월별고객별판매집계 t
+where 판매구분 = 'A'
+and   판매월 in ('201801' ,'201802' ,'201803' ,'201804' ,'201805' , .....  ,'201812')
+```
 
-- Index Skip Scan 힌트 : `/*+ INDEX_SS(t 월별고객별판매집계_IDX2) */`
-- Ex. 2018년 1월 ~ 12월까지의 'A'상품과 'B'상품의 판매데이터
-    - 데이터 갯수 : A=10만개, B=110만개
-    - `create index 월별고객별판매집계_IDX2 on 월별고객별판매집계(판매월 , 판매구분)`
-    - 이 인덱스를 사용할 경우, 쓸데없이 월별로 'B'상품 블록을 전부 탐색해야함!
-    - 이 때 Index Skip Scan 을 활용하면, 탐색블록이 확 줄어든다~
+```sql
+<Index Skip Scan>
+select /*+ INDEX_SS(t 월별고객별판매집계_IDX2) */ count(*)
+from 월별고객별판매집계 t
+where 판매구분 = 'A'
+and   판매월 between '201801' and '201812'
+```
+
+|구분| between | IN-List | Skip Scan|
+|---|---|---|---|
+|블록 I/O(cr)| 3,090 | 314 | 300 |
+
+- 선두컬럼이 	BETWEEN이어서 나머지 검색 조건을 만족하는 데이터들이 서로 멀리 떨어져 있을 때, Index Skip Scan의 위력이 나타난다.
 
 ### 3.3.8 IN 조건은 '='인가
 
