@@ -140,16 +140,6 @@ and   C3 = '나'
 and   C4 = 'a'
 ```
 
-
-```sql
-<조건절 1>
-where C1 = 1
-and   C2 = 'A'
-and	  C3 = '나'
-and 		C4 = 'a'
-```
-
-
 ```sql
 <조건절 2>
 where C1 = 1
@@ -157,7 +147,6 @@ and   C2 = 'A'
 and   C3 = '나'
 and   C4 >= 'a'
 ```
-
 
 ```sql
 <조건절 3>
@@ -167,7 +156,6 @@ and   C3 between '가' and '다'
 and   C4 = 'a'
 ```
 
-
 ```sql
 <조건절 4>
 where C1 = 1
@@ -175,7 +163,6 @@ and   C2 <= 'B'
 and   C3 = '나'
 and   C4 between 'a' and 'b'
 ```
-
 
 ```sql
 <조건절 5>
