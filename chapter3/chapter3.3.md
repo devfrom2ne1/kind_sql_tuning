@@ -24,7 +24,7 @@
 
 #### 인덱스 스캔 효율성 측정 방식(SQL 트레이스)
 
-```sql
+```
 Rows	Row Source Operation
 ------	-------------------------------------------
 	10	TABLE ACCESS BY INDEX ROWID BIG_TABLE (cr=7471 pr=1466 pw=0 time=22137 us)
