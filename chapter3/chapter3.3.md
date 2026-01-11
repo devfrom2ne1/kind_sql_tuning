@@ -239,25 +239,27 @@ create index 월별고객별판매집계_IDX2 on 월별고객별판매집계(판
 |---|---|---|---|
 | 블록 I/O( = `cr`) | 3,090 | 314 | 300 |
 
+#### <between>
 
 ```sql
-<between>
 select /*+ index(t 월별고객별판매집계_IDX2) */ count(*)
 from 월별고객별판매집계 t
 where 판매구분 = 'A'
 and   판매월 between '201801' and '201812'
 ```
 
+#### <IN-List>
+
 ```sql
-<IN-List>
 select /*+ index(t 월별고객별판매집계_IDX2) */ count(*)
 from 월별고객별판매집계 t
 where 판매구분 = 'A'
 and   판매월 in ('201801' ,'201802' ,'201803' ,'201804' ,'201805' , .....  ,'201812')
 ```
 
+#### <Index Skip Scan>
+
 ```sql
-<Index Skip Scan>
 select /*+ INDEX_SS(t 월별고객별판매집계_IDX2) */ count(*)
 from 월별고객별판매집계 t
 where 판매구분 = 'A'
