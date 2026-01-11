@@ -154,8 +154,8 @@ and 		C4 = 'a'
 <조건절 2>
 where C1 = 1
 and   C2 = 'A'
-and	  C3 = '나'
-and 		C4 >= 'a'
+and   C3 = '나'
+and   C4 >= 'a'
 ```
 
 
@@ -163,8 +163,8 @@ and 		C4 >= 'a'
 <조건절 3>
 where C1 = 1
 and   C2 = 'A'
-and	  C3 between '가' and '다'
-and 		C4 = 'a'
+and   C3 between '가' and '다'
+and   C4 = 'a'
 ```
 
 
@@ -172,8 +172,8 @@ and 		C4 = 'a'
 <조건절 4>
 where C1 = 1
 and   C2 <= 'B'
-and	  C3 = '나'
-and 		C4 between 'a' and 'b'
+and   C3 = '나'
+and   C4 between 'a' and 'b'
 ```
 
 
@@ -181,8 +181,8 @@ and 		C4 between 'a' and 'b'
 <조건절 5>
 where C1 between 1 and 3
 and   C2 = 'A'
-and	  C3 = '나'
-and 		C4 = 'a'
+and   C3 = '나'
+and   C4 = 'a'
 ```
 
 | | 인덱스 액세스 조건 | 인덱스 필터 조건 |
