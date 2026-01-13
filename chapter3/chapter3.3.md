@@ -454,34 +454,7 @@ and (
 	- 이 쿼리에선 :cust_id가 null이면 아무 결과도 나오지 않는다. 
 	- 무조건 cust_id를 입력해야 하는 경우를 쿼리에 명시한 것이나 다름 없다!
 
-
-3. 인덱스 활용해서 Null이 입력됏을 때 전체조회되게 하려면?
-
-```sql
--- 1. 고객ID가 입력되었을 때 (인덱스 Range Scan 쿼리)
-select * from 거래
-where :cust_id is not null
-  and 고객ID = :cust_id
-  and ( (:dt_type = 'A' and ...) or (:dt_type = 'B' and ...) )
-
-union all
-
--- 2. 고객ID가 입력되지 않았을 때 (전체 조회용 쿼리)
-select * from 거래
-where :cust_id is null
-  and ( (:dt_type = 'A' and ...) or (:dt_type = 'B' and ...) )
-```
-
--  :cust_id에 값이 들어오면
-	- [전체 조회용 쿼리]에서 `where :cust_id is null` 조건이 시작부터 False가 됩니다. 
-	- 옵티마이저는 이를 확인하자마자 데이터를 읽으러 가지도 않고 종료합니다.
-	- 이를 FILTER 오퍼레이션이라 하며, 성능 소모가 거의 없습니다.
-
-- :cust_id가 null이면
-	- 반대로 [인덱스 Range Scan용 쿼리]가 즉시 종료되고, [전체 조회용 쿼리]만 실행됩니다. 
-	- 이때 [전체 조회용 쿼리]는 고객ID 조건이 없으므로 거래일자 인덱스를 타거나 테이블 풀스캔을 하겠죠.
-
-4. OR 조건을 활용한 옵션 조건을 고려해도 되는 경우
+3. OR 조건을 활용한 옵션 조건을 고려해도 되는 경우
 	- 인덱스 액세스 조건으로 사용 불가할 때
 	- 인덱스 필터 조건으로도 사용 불가할 때
 	- 테이블 필터 조건으로만 사용 가능할 때
@@ -489,6 +462,42 @@ where :cust_id is null
 		- 컬럼 중 하나가 NOT NULL이면, 해당 행은 무조건 인덱스에 저장되기 때문에 모두 Null인 경우가 발생할 수 없기 때문입니다.
 		- 옵티마이저는 테이블의 모든 행이 인덱스에 다 들어있다고 판단하기 때문에 
 		- 굳이 무거운 테이블을 다 읽지 않고, 인덱스 전체를 훑으면서(Index Full Scan) 조건에 맞는 것만 걸러내게 됩니다(Filter)
+
+
+#### UNION ALL 
+> 인덱스 활용해서 Null이 입력됏을 때 전체조회되게 하려면? Union all이 답이다!
+
+```sql
+-- 1. 고객ID가 입력되지 않았을 때 (전체 조회용 쿼리)
+select * from 거래
+where :cust_id is null
+  and 거래일자 between :dt1 and :dt2
+
+union all
+
+-- 2. 고객ID가 입력되었을 때 (인덱스 Range Scan 쿼리)
+select * from 거래
+where :cust_id is not null
+  and 고객ID = :cust_id
+  and 거래일자 between :dt1 and :dt2
+```
+
+1. 고객ID가 입력되지 않았을 때 (전체 조회용 쿼리)
+	- :cust_id가 null이면
+		- [인덱스 Range Scan용 쿼리]가 즉시 종료되고, [전체 조회용 쿼리]만 실행됩니다. 
+		- 이때 [전체 조회용 쿼리]는 고객ID 조건이 없으므로 거래일자 인덱스를 타거나 테이블 풀스캔을 한다.
+
+2. 고객ID가 입력되었을 때 (인덱스 Range Scan 쿼리)
+	-  :cust_id에 값이 들어오면
+		- [전체 조회용 쿼리]에서 `where :cust_id is null` 조건이 시작부터 False가 됩니다. 
+		- 옵티마이저는 이를 확인하자마자 데이터를 읽으러 가지도 않고 종료합니다.
+		- 이를 FILTER 오퍼레이션이라 하며, 성능 소모가 거의 없습니다.
+		- 그리고 [고객ID + 거래일자] 인덱스를 사용해 데이터를 찾는다.
+
+- UNION ALL 방식의 장단점
+	- 옵션 조건 컬럼도 인덱스 액세스 조건으로 사용한다.
+	- NULL 허용 컬럼이더라도 사용하는 데 전혀 문제가 없다. 
+	- 유일한 단점은 SQL 코딩량이 길어진다는 점이다.
 
 #### LIKE/BETWEEN 조건
 
@@ -512,11 +521,7 @@ and 상품코드 like :prd_cd || '%' -- 옵션조건
 	- 숫자형이 + 인덱스 액세스 조건으로 사용 가능한 컬럼 = LIKE 금물(X) → 자동형변환 비효율
 	- 가변 길이 컬럼 = LIKE 유의(X) → 같은 길이가 아닌 데이터도 조회됨
 
-#### UNION ALL 
 
-- 옵션 조건 컬럼도 인덱스 액세스 조건으로 사용한다.
-- NULL 허용 컬럼이더라도 사용하는 데 전혀 문제가 없다. 
-- 유일한 단점은 SQL 코딩량이 길어진다는 점이다.
 
 #### NVL/DECODE
 
