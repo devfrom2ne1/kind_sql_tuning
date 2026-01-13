@@ -412,6 +412,33 @@ and 주문매체구분코드 between :주문매체구분1 and :주문매체구�
 
 #### OR 조건
 
+
+1. 인덱스 활용 불가 (Filter 방식)
+
+```sql
+select * from 거래
+where ( :cust_id is null or 고객ID = :cust_id)
+and 거래일자 between :dt1 and :dt2
+```
+
+- [고객ID + 거래일자] 인덱스가 있어도 사용할 수 없게 된다. 
+	- 인덱스 선두컬럼인 고객ID에 OR조건이 있기 때문이다.
+
+2. 인덱스 활용 가능 (OR-Expansion 방식)
+
+```sql
+select * from 거래
+where 고객ID = :cust_id
+and (
+			( :dt_type = 'A' and 거래일자 between :dt1 and dt2 ) or
+			( :dt_type = 'B' and 거래일자 between :dt1 and dt2 )
+)
+```
+
+- 위의 쿼리처럼 작성하면, OR-Expansion이 작동해서 인덱스 사용이 가능해진다.
+	- 선두 컬럼을 =로 고정하고 뒤쪽 조건만 OR로 나눔으로써, 옵티마이저가 **"그럼 내가 두 번에 나눠서 인덱스를 타줄게!"** 라고 판단할 수 있게 유도했기 때문입니다.
+
+
 #### LIKE/BETWEEN 조건
 
 #### UNION ALL 
