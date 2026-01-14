@@ -8,7 +8,7 @@
 | 다중 치환 | COALESCE | COALESCE | COALESCE | COALESCE |
 | 빈 문자열 ('') | NULL과 동일함 | 데이터로 인식 | 데이터로 인식 | 데이터로 인식 |
 | 정렬(ASC) 시 | 맨 뒤 (가장 큼) | 맨 앞 (가장 작음) | 맨 앞 (가장 작음) | 맨 뒤 (가장 큼) |
-| 문자열 결합 | `A || NULL` = A | CONCAT 사용 시 NULL | `A + NULL` = NULL | `A || NULL` = NULL |
+| 문자열 결합 | A \|\| NULL = A | CONCAT 사용 시 NULL | A + NULL = NULL | A \|\| NULL = NULL |
 | 정렬 옵션 | NULLS FIRST/LAST | 편법(IS NULL) 사용 | 지원 안 함 | NULLS FIRST/LAST |
 
 ### 🔍 핵심 차이점 상세 분석
