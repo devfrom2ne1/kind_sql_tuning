@@ -76,21 +76,6 @@ SELECT COALESCE(comm, 0) FROM emp;
 	- 중복을 따지지 않으므로 양쪽의 NULL이 모두 결과에 포함됩니다.
 
 
-###  DB별 특이점 및 꿀팁
-🔹 Oracle
- * 빈 문자열 주의: INSERT INTO tab (col) VALUES ('');를 실행하면 col에는 NULL이 들어갑니다. 따라서 WHERE col = ''로는 조회가 안 되고 반드시 WHERE col IS NULL을 써야 합니다.
- * NVL2: NVL2(컬럼, '값있음', '값없음') 함수가 있어 매우 편리합니다.
-🔹 MySQL
- * IFNULL vs COALESCE: 둘 다 사용 가능하지만, 여러 인자를 체크할 때는 표준인 COALESCE를 권장합니다.
- * 정렬 꼼수: ORDER BY 컬럼 ASC 시 NULL을 뒤로 보내고 싶다면 ORDER BY -컬럼 DESC 또는 ORDER BY 컬럼 IS NULL, 컬럼 ASC를 사용합니다.
-🔹 MSSQL
- * SET CONCAT_NULL_YIELDS_NULL: 이 옵션 설정에 따라 문자열 결합 시 NULL 처리 방식이 달라질 수 있지만, 기본적으로는 NULL과 합치면 NULL이 되는 것이 원칙입니다.
- * ISNULL: Oracle의 NVL과 이름이 비슷하지만 MSSQL 전용입니다.
-🔹 PostgreSQL
- * 표준에 가장 엄격: NVL이나 IFNULL 같은 전용 함수보다는 표준인 COALESCE를 적극적으로 사용합니다.
- * Boolean 타입: NULL은 TRUE도 FALSE도 아닌 UNKNOWN 상태를 가집니다.
-
-
 ### 실전 예시 
 
 ```sql
