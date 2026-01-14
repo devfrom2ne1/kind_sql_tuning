@@ -523,8 +523,9 @@ and 상품코드 like :prd_cd || '%' -- 옵션조건
 
 #### NVL/DECODE
 
-NVL이나 DECODE를 이용한 OR Expansion은 인덱스를 탈 수 없던 "옵션 조건(Optional Condition)"을 인덱스 액세스 조건으로 바꾸는 핵심 튜닝 기법입니다.
-보통 화면에서 검색 조건을 입력할 때, 값이 들어올 수도 있고 안 들어올 수도 있는 "옵션 조건"으ㄹ 처리하기 위해 이 기법을 사용합니다.
+> ![NOTE]
+> NVL이나 DECODE를 이용한 OR Expansion은 인덱스를 탈 수 없던 "옵션 조건(Optional Condition)"을 인덱스 액세스 조건으로 바꾸는 핵심 튜닝 기법입니다.
+> 보통 화면에서 검색 조건을 입력할 때, 값이 들어올 수도 있고 안 들어올 수도 있는 "옵션 조건"으ㄹ 처리하기 위해 이 기법을 사용합니다.
 
 1. [Before] 튜닝 전 (Full Table Scan 유발)
 
