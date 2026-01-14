@@ -539,7 +539,6 @@ WHERE 주문일자 = NVL(:v_date, 주문일자);
 
 
 2. [After] 튜닝 후 (OR Expansion 발생)
-Oracle 내부적으로 쿼리가 다음과 같이 물리적으로 분리됩니다.
 
 ```sql
 -- 1번: 변수가 있을 때 (Index Range Scan)
@@ -549,6 +548,7 @@ UNION ALL
 SELECT * FROM 주문 WHERE :v_date IS NULL;
 ```
 
+- Oracle 내부적으로 쿼리가 물리적으로 분리됩니다.
 - 효과: 이제 :v_date에 값이 들어오면 1번 쿼리가 동작하여 주문일자 인덱스를 아주 빠르게(Unique/Range Scan) 사용하게 됩니다.
 
 - NVL vs DECODE 튜닝의 차이점
@@ -575,3 +575,58 @@ SELECT * FROM 주문 WHERE :v_date IS NULL;
 
 
 ### 3.3.12 함수호출부 해소를 위한 인덱스 구성
+
+#### PL/SQL 함수의 성능적 특성
+
+```sql
+select 회원번호, GET_ADDR(우편번호) as 기본주소
+from 회원
+where 생월일 like '01%'
+```
+
+- 만약 이 조건을 만족하는 회원이 100만 명이라면?
+	- GET_ADDR함수도 100만 번 실행된다.
+	- 만약 이 함수에 SQL이 내장되어 있다면 그 SQL도 100만 번 실행된다.
+
+#### 효과적인 인덱스 구성을 통한 함수호출 최소화
+
+```sql
+create index 회원_X01 on 회원(생년);
+```
+```sql
+select /*+ index(a 회원_X01) */ 회원번호, 회원명
+from 회원 a
+where 생년 = '1987'
+and 암호화된 전화번호 = encryption( :phone_no )
+```
+
+- 암호화된_전화번호 : 테이블액세서 단계에서 필터링됨
+- encryption 함수 : `생년 = '1987'` 조건을 만족하는 건수만큼 수행됨
+
+
+```sql
+create index 회원_X02 on 회원(생년, 생월일, 암호화된_전화번호);
+```
+```sql
+select /*+ index(a 회원_X02) */ 회원번호, 회원명
+from 회원 a
+where 생년 = '1987'
+and 암호화된 전화번호 = encryption( :phone_no )
+```
+
+- 암호화된_전화번호 : 선행 컬럼인 '생월일'에 대한 = 조건이 없으므로, 인덱스 필터 조건임
+- encryption 함수 : `생년 = '1987'` 조건을 만족하는 건수만큼 수행됨(=인덱스 스캔 횟수)
+
+
+```sql
+create index 회원_X03 on 회원(생년, 암호화된 전화번호);
+```
+```sql
+select /*+ index(a 회원_X01) */ 회원번호, 회원명
+from 회원 a
+where 생년 = '1987'
+and 암호화된 전화번호 = encryption( :phone_no )
+```
+
+- 암호화된_전화번호 : 선행 컬럼인 '생년'에 대한 = 조건이 있으므로, 인덱스 액세스 조건임
+- encryption 함수 : 암호화된_전화번호도 인덱스 액세스 조건으로 사용되므로, 함수는 딱 한 번만 수행된다.
