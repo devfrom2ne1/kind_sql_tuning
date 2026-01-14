@@ -4,13 +4,12 @@
 
 | 구분 | Oracle | MySQL | MSSQL (SQL Server) | PostgreSQL |
 |---|---|---|---|---|
-| 빈 문자열 ('') | NULL로 취급 | 데이터로 취급 (NULL 아님) | 데이터로 취급 (NULL 아님) | 데이터로 취급 (NULL 아님) |
-| 기본 치환 함수 | NVL | IFNULL | ISNULL | - (표준 함수 사용) |
-| 표준 치환 함수 | COALESCE | COALESCE | COALESCE | COALESCE |
-| 조건부 치환 | NVL2 | IF | - | - |
-| 정렬 시 기본 위치 | 마지막 (가장 큼) | 처음 (가장 작음) | 처음 (가장 작음) | 마지막 (가장 큼) |
-| 정렬 옵션 지원 | NULLS FIRST/LAST | 편법 사용 필요* | - | NULLS FIRST/LAST |
-| 문자열 연결 연산 | A || NULL = A | CONCAT(A, NULL) = NULL | A + NULL = NULL | A || NULL = NULL |
+| 치환 함수 | NVL(col, 0) | IFNULL(col, 0) | ISNULL(col, 0) | COALESCE(col, 0) |
+| 다중 치환 | COALESCE | COALESCE | COALESCE | COALESCE |
+| 빈 문자열 ('') | NULL과 동일함 | 데이터로 인식 | 데이터로 인식 | 데이터로 인식 |
+| 정렬(ASC) 시 | 맨 뒤 (가장 큼) | 맨 앞 (가장 작음) | 맨 앞 (가장 작음) | 맨 뒤 (가장 큼) |
+| 문자열 결합 | `A || NULL` = A | CONCAT 사용 시 NULL | `A + NULL` = NULL | `A || NULL` = NULL |
+| 정렬 옵션 | NULLS FIRST/LAST | 편법(IS NULL) 사용 | 지원 안 함 | NULLS FIRST/LAST |
 
 ### 🔍 핵심 차이점 상세 분석
 #### 1. 빈 문자열('')에 대한 태도
