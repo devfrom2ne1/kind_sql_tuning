@@ -523,5 +523,54 @@ and 상품코드 like :prd_cd || '%' -- 옵션조건
 
 #### NVL/DECODE
 
+NVL이나 DECODE를 이용한 OR Expansion은 인덱스를 탈 수 없던 "옵션 조건(Optional Condition)"을 인덱스 액세스 조건으로 바꾸는 핵심 튜닝 기법입니다.
+보통 화면에서 검색 조건을 입력할 때, 값이 들어올 수도 있고 안 들어올 수도 있는 "옵션 조건"으ㄹ 처리하기 위해 이 기법을 사용합니다.
+
+1. [Before] 튜닝 전 (Full Table Scan 유발)
+
+```sql
+SELECT * FROM 주문 
+WHERE 주문일자 = NVL(:v_date, 주문일자);
+```
+-  문제점
+	- :v_date에 값이 들어오더라도, 옵티마이저는 `주문일자 = 주문일자`라는 전체 비교 가능성 때문에 인덱스를 타지 못하고 Full Table Scan을 선택하는 경우가 많습니다. 
+	- 혹은 인덱스를 타더라도 비효율적인 스캔을 하게 됩니다.
+
+
+2. [After] 튜닝 후 (OR Expansion 발생)
+Oracle 내부적으로 쿼리가 다음과 같이 물리적으로 분리됩니다.
+
+```sql
+-- 1번: 변수가 있을 때 (Index Range Scan)
+SELECT * FROM 주문 WHERE :v_date IS NOT NULL AND 주문일자 = :v_date
+UNION ALL
+-- 2번: 변수가 NULL일 때 (Full Table Scan 또는 다른 조건 검색)
+SELECT * FROM 주문 WHERE :v_date IS NULL;
+```
+
+- 효과: 이제 :v_date에 값이 들어오면 1번 쿼리가 동작하여 주문일자 인덱스를 아주 빠르게(Unique/Range Scan) 사용하게 됩니다.
+
+- NVL vs DECODE 튜닝의 차이점
+두 함수 모두 OR Expansion을 유도할 수 있지만, 실행 계획상의 특성이 약간 다릅니다.
+
+| 함수 | 예시 | 특징 |
+|---|---|---|
+| NVL | WHERE 컬럼 = NVL(:var, 컬럼) | 가장 직관적이며 최신 Oracle 버전에서 자동 Expansion이 잘 일어남. |
+| DECODE | WHERE 컬럼 = DECODE(:var, NULL, 컬럼, :var) | 과거 버전에서 NVL보다 OR Expansion을 더 잘 유도하기 위해 테크니컬하게 사용함. |
+
+- NULL 허용 컬럼에서는 사용 불가
+	- 이 기법이 항상 정답은 아닙니다. 아래 상황을 꼭 체크해야 합니다.
+	- 컬럼의 NULL 허용 여부:
+		- 만약 주문일자 컬럼에 NULL이 허용된다면, 주문일자 = 주문일자 조건에서 NULL인 데이터는 누락됩니다. 따라서 기본값이 설정된(NOT NULL) 컬럼에 사용하는 것이 안전합니다.
+
+- 모든 옵션 조건을 처리할 수 없다
+	- NVL/DECODE 함수를 여러 개 사용하게 된다면, 그 중 변별력이 가장 좋은 컬럼 기준으로만 딱 한 번 OR Expansion이 일어나기 때문이다. 
+	- 따라서 모든 옵션 조건을 NVL/DECODE 방식으로 처리할 수 없다.
+
+- "동적 쿼리"의 대안
+	- 원래는 애플리케이션 레벨에서 if (:v_date != null)일 때 쿼리를 다르게 생성하는 **동적 쿼리(Dynamic SQL)** 를 써야 가장 빠릅니다.
+	- 하지만 동적 쿼리를 쓰기 어려운 환경(예: Static SQL만 허용되는 환경)에서 하나의 쿼리로 인덱스 효율을 극대화하기 위해 선택하는 아주 강력한 튜닝 기법이 바로 이 NVL/DECODE를 이용한 OR Expansion입니다.
+
+
 
 ### 3.3.12 함수호출부 해소를 위한 인덱스 구성
