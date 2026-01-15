@@ -132,3 +132,68 @@ and   c.최종주문금액 >= 20000   --- (4)
 ### 4.1.6 NL 조인 튜닝 실습
 
 ### 4.1.7 NL 조인 확장 매커니즘
+
+#### 테이블 Prefetch
+
+- 보통 이 힌트들은 오라클에서 NL 조인의 테이블 Prefetch 기능을 강제로 켜거나 끌 때 사용합니다.
+- 오라클 11g 이상부터는 NLJ_PREFETCH보다 더 강력한 NLJ_BATCHING이 기본적으로 작동하는 경우가 많습니다. 
+- 정렬(Order) 문제
+	- no_nlj_prefetch를 쓰는 가장 큰 이유 중 하나는 데이터가 인덱스 정렬 순서 그대로 나오길 기대할 때입니다. 
+	- Prefetch나 Batching이 들어가면 미세하게 결과 순서가 바뀔 수 있거든요.
+
+1. nlj_prefetch 힌트 사용 예시
+
+```sql
+SELECT /*+ LEADING(o) USE_NL(i) NLJ_PREFETCH(i) */
+       o.order_date, i.product_id, i.quantity
+FROM   orders o, order_items i
+WHERE  o.order_id = i.order_id
+  AND  o.customer_id = :cust_id;
+```
+
+```
+--------------------------------------------------------------------------------------
+| Id  | Operation                    | Name          | Rows  | Bytes | Cost (%CPU)|
+--------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT             |               |    10 |   500 |    25   (0)|
+|   1 |  TABLE ACCESS BY INDEX ROWID | ORDER_ITEMS   |     2 |    40 |     2   (0)|
+|   2 |   NESTED LOOPS               |               |    10 |   500 |    25   (0)|
+|   3 |    TABLE ACCESS FULL         | ORDERS        |     5 |   150 |    15   (0)|
+|* 4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
+--------------------------------------------------------------------------------------
+```
+
+- `nlj_prefetch` 힌트는 오라클이 판단하기에 Prefetch 효율이 낮다고 생각하여 일반적인 NL 조인을 하려고 할 때, **"아니야, 테이블 블록을 미리 좀 퍼 올려줘"** 라고 강제할 때 씁니다.
+- `nlj_prefetch`가 성공적으로 적용되면, TABLE ACCESS가 NESTED LOOPS보다 위로 올라가는 형태가 됩니다.
+- `TABLE ACCESS BY INDEX ROWID`가 Id 2번(NESTED LOOPS)의 결과물을 받아서 처리하는 부모 노드 역할을 합니다.
+
+2. no_nlj_prefetch 힌트 사용 예시
+
+```sql
+SELECT /*+ LEADING(o) USE_NL(i) NO_NLJ_PREFETCH(i) */
+       o.order_date, i.product_id, i.quantity
+FROM   orders o, order_items i
+WHERE  o.order_id = i.order_id
+  AND  o.customer_id = :cust_id;
+```
+
+```
+--------------------------------------------------------------------------------------
+| Id  | Operation                    | Name          | Rows  | Bytes | Cost (%CPU)|
+--------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT             |               |    10 |   500 |    25   (0)|
+|   1 |  NESTED LOOPS                |               |    10 |   500 |    25   (0)|
+|   2 |   TABLE ACCESS FULL          | ORDERS        |     5 |   150 |    15   (0)|
+|   3 |   TABLE ACCESS BY INDEX ROWID| ORDER_ITEMS   |     2 |    40 |     2   (0)|
+|* 4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
+--------------------------------------------------------------------------------------
+```
+
+- 반대로, Prefetch 기능 때문에 오히려 성능이 떨어지거나, 실행 계획을 아주 전통적인(Classical) NL 조인 형태로 고정하고 싶을 때 사용합니다.
+- Prefetch를 끄면 우리가 흔히 아는 가장 기본적인 NL 조인 구조로 돌아옵니다.
+- NESTED LOOPS가 가장 위에 있고, 그 아래에 바로 TABLE ACCESS가 자식 노드로 붙어 있습니다. 
+- 한 건 읽을 때마다 바로 테이블로 가는 순차적인 방식입니다.
+
+#### 배치 I/O
+
+[부분범위처리와 배치 I/O](https://github.com/devfrom2ne1/kind_sql_tuning/blob/main/chapter3/chapter3.2.md)
