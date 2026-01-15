@@ -1,4 +1,4 @@
-# 4. 조인 튜닝
+## 4. 조인 튜닝
 
 ## 4.1 NL 조인
 
@@ -135,13 +135,45 @@ and   c.최종주문금액 >= 20000   --- (4)
 
 #### 테이블 Prefetch
 
-- 보통 이 힌트들은 오라클에서 NL 조인의 테이블 Prefetch 기능을 강제로 켜거나 끌 때 사용합니다.
-- 오라클 11g 이상부터는 NLJ_PREFETCH보다 더 강력한 NLJ_BATCHING이 기본적으로 작동하는 경우가 많습니다. 
-- 정렬(Order) 문제
-	- no_nlj_prefetch를 쓰는 가장 큰 이유 중 하나는 데이터가 인덱스 정렬 순서 그대로 나오길 기대할 때입니다. 
-	- Prefetch나 Batching이 들어가면 미세하게 결과 순서가 바뀔 수 있거든요.
+> [!NOTE]
+> Prefetch는 **"Inner 테이블을 먼저 읽는 것"** 이 아니라, **"Inner 테이블의 인덱스를 읽는 시점에, 곧 필요해질 테이블 블록들을 미리 예측해서 메모리에 로드하는 기술"** 입니다.
+> 덕분에 디스크 I/O를 기다리는 시간(db file sequential read)이 획기적으로 줄어들게 됩니다.
 
-1. nlj_prefetch 힌트 사용 예시
+| 단계 | 전통적인 NL 조인 | Prefetch 적용 NL 조인 |
+|---|---|---|
+| 1단계 | Outer 한 건 읽기 | Outer 한 건 읽기 |
+| 2단계 | Inner 인덱스 한 건 찾기 | Inner 인덱스 여러 건(ROWID) 미리 확인 |
+| 3단계 | 해당 테이블 블록 1개 읽기 | 미리 확인한 ROWID들의 블록들을 한꺼번에 캐싱 |
+| 4단계 | 조인 수행 | 캐시된 블록에서 즉시 조인 수행 |
+
+- Prefetch는 조인 순서(Outer → Inner) 자체가 바뀌는 것은 아닙니다. 	
+	- 드라이빙 테이블(Outer)을 먼저 읽어야 드리븐 테이블(Inner)을 찾을 수 있다는 NL 조인의 기본 원칙은 그대로 유지됩니다.
+- 헷갈리실 수 있는 부분은 "데이터를 디스크에서 퍼 올리는 시점" 때문일 거예요. 
+- Prefetch가 '먼저' 하는 것
+	- 전통적인 NL 조인은 **[인덱스 한 건 읽기 → 테이블 한 건 읽기]** 를 무한 반복합니다. 
+	- 하지만 Prefetch는 이 순서를 살짝 비틉니다.
+
+- Prefetch 순서
+	- Outer 테이블에서 조인할 조건의 행을 하나 읽습니다.
+ 	- Inner 테이블의 인덱스를 탐색하여 테이블의 주소(ROWID)를 찾습니다.
+	- **여기서 핵심** : 찾은 ROWID를 가지고 바로 테이블로 달려가는 게 아니라, 인덱스 리프 블록에 있는 다음 ROWID들을 미리 훑어봅니다.
+	- "어차피 다음 루프에서 이 블록들이 필요하겠네?"라고 판단되면?
+	- 실제 조인이 일어나기 '전'에 해당 테이블 블록들을 디스크에서 버퍼 캐시로 한꺼번에(Parallel/Batch) 퍼 올립니다.
+> 결론: 조인 순서가 바뀌는 게 아니라, **"Inner 테이블의 데이터 블록을 실제 조인 단계가 오기 전에 미리 메모리에 갖다 놓는 것"** 입니다.
+
+- 왜 실행계획에서는 Inner Table이 위로 가 보일까?
+	- 이 구조 때문에 실행계획의 모양이 바뀌어서 오해하기 쉽습니다.
+	- 일반 NL 조인 : NESTED LOOPS가 부모고, 그 아래에 Outer와 Inner(Index+Table)가 자식으로 붙음.
+ 	- Prefetch 적용: TABLE ACCESS(Inner)가 NESTED LOOPS보다 위(부모)에 위치함.
+	- 이것은 **"조인이 완료된 결과(ROWID 세트)를 부모 노드인 TABLE ACCESS 연산에 던져주면, 부모가 블록을 한꺼번에 퍼 올린다"** 는 처리 흐름을 보여주는 것이지, 
+	- 테이블을 먼저 읽는다는 뜻이 아닙니다.
+
+- 오라클 11g 이상부터는 `NLJ_PREFETCH`보다 더 강력한 `NLJ_BATCHING`이 기본적으로 작동하는 경우가 많습니다. 
+- 정렬(Order) 문제
+	- `no_nlj_prefetch`를 쓰는 가장 큰 이유 중 하나는 데이터가 인덱스 정렬 순서 그대로 나오길 기대할 때입니다. 
+	- Prefetch나 Batching이 들어가면 미세하게 결과 순서가 바뀔 수 있기 때문입니다.
+
+#### nlj_prefetch 힌트 사용 예시
 
 ```sql
 SELECT /*+ LEADING(o) USE_NL(i) NLJ_PREFETCH(i) */
@@ -167,7 +199,7 @@ WHERE  o.order_id = i.order_id
 - `nlj_prefetch`가 성공적으로 적용되면, TABLE ACCESS가 NESTED LOOPS보다 위로 올라가는 형태가 됩니다.
 - `TABLE ACCESS BY INDEX ROWID`가 Id 2번(NESTED LOOPS)의 결과물을 받아서 처리하는 부모 노드 역할을 합니다.
 
-2. no_nlj_prefetch 힌트 사용 예시
+#### no_nlj_prefetch 힌트 사용 예시
 
 ```sql
 SELECT /*+ LEADING(o) USE_NL(i) NO_NLJ_PREFETCH(i) */
