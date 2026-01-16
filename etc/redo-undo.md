@@ -5,7 +5,7 @@
 ## 1. Redo 로그 (다시 하기)
 Redo 로그는 **"이미 완료된 변경 사항을 유실하지 않기 위해"** 기록하는 로그입니다.
 
-* **핵심 역할:** 시스템 장애 발생 시, 마지막 성공 지점까지 데이터를 **재현(Replication)**합니다.
+* **핵심 역할:** 시스템 장애 발생 시, 마지막 성공 지점까지 데이터를 **재현(Replication)** 합니다.
 * **보관 데이터:** 변경 **후**의 값 (New Value)
 * **보장 원칙:** ACID 원칙 중 **영속성(Durability)**
 * **작동 방식:** 
@@ -15,6 +15,11 @@ Redo 로그는 **"이미 완료된 변경 사항을 유실하지 않기 위해"*
 	1. Database Recovery( Media Recovery)
 	2. Cache Recover( Instance Recovery 시 roll forward 단계)
 	3. Fast Commit
+* **매커니즘**:
+	1. Log Force At Commit
+	2. Fast Commit
+	3. Write Ahead Logging
+
 
 ## 2. Undo 로그 (되돌리기)
 Undo 로그는 **"변경 중인 데이터를 이전 상태로 되돌리기 위해"** 기록하는 로그입니다.
