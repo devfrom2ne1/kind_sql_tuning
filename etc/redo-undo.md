@@ -11,6 +11,10 @@ Redo 로그는 **"이미 완료된 변경 사항을 유실하지 않기 위해"*
 * **작동 방식:** 
 	1. 데이터 변경 시 로그를 먼저 기록합니다.
 	2. 시스템이 비정상 종료 후 재시작되면, Redo 로그를 읽어 데이터 파일에 반영되지 않은 변경 건을 다시 실행합니다.
+* **사용 목적:**
+	1. Database Recovery( Media Recovery)
+	2. Cache Recover( Instance Recovery 시 roll forward 단계)
+	3. Fast Commit
 
 ## 2. Undo 로그 (되돌리기)
 Undo 로그는 **"변경 중인 데이터를 이전 상태로 되돌리기 위해"** 기록하는 로그입니다.
@@ -22,6 +26,10 @@ Undo 로그는 **"변경 중인 데이터를 이전 상태로 되돌리기 위�
     1. 데이터를 변경하기 직전, 이전 값을 Undo 영역에 복사해둡니다.
     2. 사용자가 `ROLLBACK`을 수행하면 이 로그를 사용해 데이터를 원복합니다.
     3. 다른 사용자가 수정 중인 데이터를 조회할 때, 일관성을 위해 수정 전 값을 보여주는 용도(MVCC)로도 사용됩니다.
+* **사용 목적:**
+	1. Transaction Rollback
+	2. Transaction Recovery (Instance Recovery 시 rollback 단계)
+	3. Read Consistency
 
 ---
 
