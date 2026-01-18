@@ -161,13 +161,6 @@ and   c.최종주문금액 >= 20000   --- (4)
 	- 실제 조인이 일어나기 '전'에 해당 테이블 블록들을 디스크에서 버퍼 캐시로 한꺼번에(Parallel/Batch) 퍼 올립니다.
 > 결론: 조인 순서가 바뀌는 게 아니라, **"Inner 테이블의 데이터 블록을 실제 조인 단계가 오기 전에 미리 메모리에 갖다 놓는 것"** 입니다.
 
-- 왜 실행계획에서는 Inner Table이 위로 가 보일까?
-	- 이 구조 때문에 실행계획의 모양이 바뀌어서 오해하기 쉽습니다.
-	- 일반 NL 조인 : NESTED LOOPS가 부모고, 그 아래에 Outer와 Inner(Index+Table)가 자식으로 붙음.
- 	- Prefetch 적용: TABLE ACCESS(Inner)가 NESTED LOOPS보다 위(부모)에 위치함.
-	- 이것은 **"조인이 완료된 결과(ROWID 세트)를 부모 노드인 TABLE ACCESS 연산에 던져주면, 부모가 블록을 한꺼번에 퍼 올린다"** 는 처리 흐름을 보여주는 것이지, 
-	- 테이블을 먼저 읽는다는 뜻이 아닙니다.
-
 - 오라클 11g 이상부터는 `NLJ_PREFETCH`보다 더 강력한 `NLJ_BATCHING`이 기본적으로 작동하는 경우가 많습니다. 
 - 정렬(Order) 문제
 	- `no_nlj_prefetch`를 쓰는 가장 큰 이유 중 하나는 데이터가 인덱스 정렬 순서 그대로 나오길 기대할 때입니다. 
@@ -198,6 +191,14 @@ WHERE  o.order_id = i.order_id
 - `nlj_prefetch` 힌트는 오라클이 판단하기에 Prefetch 효율이 낮다고 생각하여 일반적인 NL 조인을 하려고 할 때, **"아니야, 테이블 블록을 미리 좀 퍼 올려줘"** 라고 강제할 때 씁니다.
 - `nlj_prefetch`가 성공적으로 적용되면, TABLE ACCESS가 NESTED LOOPS보다 위로 올라가는 형태가 됩니다.
 - `TABLE ACCESS BY INDEX ROWID`가 Id 2번(NESTED LOOPS)의 결과물을 받아서 처리하는 부모 노드 역할을 합니다.
+
+- 왜 실행계획에서는 Inner Table이 위로 가 보일까?
+	- 이 구조 때문에 실행계획의 모양이 바뀌어서 오해하기 쉽습니다.
+	- 일반 NL 조인 : NESTED LOOPS가 부모고, 그 아래에 Outer와 Inner(Index+Table)가 자식으로 붙음.
+ 	- Prefetch 적용: TABLE ACCESS(Inner)가 NESTED LOOPS보다 위(부모)에 위치함.
+	- 이것은 **"조인이 완료된 결과(ROWID 세트)를 부모 노드인 TABLE ACCESS 연산에 던져주면, 부모가 블록을 한꺼번에 퍼 올린다"** 는 처리 흐름을 보여주는 것이지, 
+	- 테이블을 먼저 읽는다는 뜻이 아닙니다.
+
 
 #### no_nlj_prefetch 힌트 사용 예시
 
