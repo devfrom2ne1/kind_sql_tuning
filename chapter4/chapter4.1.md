@@ -212,13 +212,13 @@ WHERE  o.order_id = i.order_id
 
 ```
 --------------------------------------------------------------------------------------
-| Id  | Operation                    | Name          | Rows  | Bytes | Cost (%CPU)|
+| Id  | Operation                    | Name           | Rows  | Bytes | Cost (%CPU)|
 --------------------------------------------------------------------------------------
-|   0 | SELECT STATEMENT             |               |    10 |   500 |    25   (0)|
-|   1 |  NESTED LOOPS                |               |    10 |   500 |    25   (0)|
-|   2 |   TABLE ACCESS FULL          | ORDERS        |     5 |   150 |    15   (0)|
-|   3 |   TABLE ACCESS BY INDEX ROWID| ORDER_ITEMS   |     2 |    40 |     2   (0)|
-|*  4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
+|   0 | SELECT STATEMENT             |                |    10 |   500 |    25   (0)|
+|   1 |  NESTED LOOPS                |                |    10 |   500 |    25   (0)|
+|   2 |   TABLE ACCESS FULL          | ORDERS         |     5 |   150 |    15   (0)|
+|   3 |   TABLE ACCESS BY INDEX ROWID| ORDER_ITEMS    |     2 |    40 |     2   (0)|
+|*  4 |    INDEX RANGE SCAN          | ORDER_ITEMS_IX |     2 |       |     1   (0)|
 --------------------------------------------------------------------------------------
 ```
 
