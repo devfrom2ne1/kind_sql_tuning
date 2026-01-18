@@ -25,7 +25,7 @@ from 사원    e,    -- Outer Table(= Driving Table)
 ```
 Exdrecution Plan
 -------------------------------
-0      SELECT STATEMENT Optimizer=ALL_ROWS
+0       SELECT STATEMENT Optimizer=ALL_ROWS
 1	0   NESTED LOOPS
 2	1     TABLE ACCESS (BY INDEX ROWID) OF '사원' (TABLE)
 3	2       INDEX (RANGE SCAN) OF '사원_X1' (INDEX)
