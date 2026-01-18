@@ -27,7 +27,7 @@ Exdrecution Plan
 -------------------------------
 0      SELECT STATEMENT Optimizer=ALL_ROWS
 1	0   NESTED LOOPS
-2	1	 TABLE ACCESS (BY INDEX ROWID) OF '사원' (TABLE)
+2	1     TABLE ACCESS (BY INDEX ROWID) OF '사원' (TABLE)
 3	2       INDEX (RANGE SCAN) OF '사원_X1' (INDEX)
 4	3     TABLE ACCESS (BY INDEX ROWID) OF '고객' (TABLE)
 5	4       INDEX (RANGE SCAN) OF '고객_X1' (INDEX)
