@@ -38,7 +38,7 @@ Exdrecution Plan
 
 #### NL조인 힌트 기술하는 방법
 
-1. use_nl 힌트
+1. **use_nl 힌트**
 
 ```sql
 select /*+ use_nl(A, B, C, D) */ *
@@ -49,7 +49,7 @@ where ...
 - `use_nl` : 네 개 테이블을 NL방식으로 조인해라 
 - `(A, B, C, D)` : 순서는 옵티마이저가 스스로 정하도록 맡긴 것이다.
 
-2. ordered 힌트
+2. **ordered 힌트**
 
 ```sql
 -- (1) e -> c 순으로 NL조인 
@@ -68,7 +68,7 @@ from A, B, C, D
 
 - `ordered` : FROM절에 기술한 순서대로 조인하라고 옵티마이저에게 지시할 때 사용하는 힌트
 
-3. leading 힌트
+3. **leading 힌트**
 
 ```sql
 select /*+ leading(A, B, C, D) use_nl(A) use_nl(D) use_hash(B) */ *
@@ -191,7 +191,7 @@ WHERE  o.order_id = i.order_id
 |   1 |  TABLE ACCESS BY INDEX ROWID | ORDER_ITEMS   |     2 |    40 |     2   (0)|
 |   2 |   NESTED LOOPS               |               |    10 |   500 |    25   (0)|
 |   3 |    TABLE ACCESS FULL         | ORDERS        |     5 |   150 |    15   (0)|
-|* 4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
+|*  4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
 --------------------------------------------------------------------------------------
 ```
 
@@ -217,7 +217,7 @@ WHERE  o.order_id = i.order_id
 |   1 |  NESTED LOOPS                |               |    10 |   500 |    25   (0)|
 |   2 |   TABLE ACCESS FULL          | ORDERS        |     5 |   150 |    15   (0)|
 |   3 |   TABLE ACCESS BY INDEX ROWID| ORDER_ITEMS   |     2 |    40 |     2   (0)|
-|* 4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
+|*  4 |    INDEX RANGE SCAN          | ITEM_ORDER_IX |     2 |       |     1   (0)|
 --------------------------------------------------------------------------------------
 ```
 
